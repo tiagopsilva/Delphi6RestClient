@@ -27,10 +27,12 @@ type
     property SigInPath: string read FSigInPath write SetSigInPath;
   private
     function FormatUrl(APath: string): string;
+    procedure FormatHeaders;
   public
     function Post(APath: string; AParams: TStringList): TStringStream;
     function Get(APath: string): TStringStream;
     function SigIn: boolean;
+    function IsLogged: boolean;
   end;
 
   ERestClientException = class(Exception);
@@ -87,6 +89,26 @@ begin
   result := FHost + APath;
 end;
 
+procedure TRestClient.FormatHeaders;
+begin
+  if Trim(FToken) <> '' then
+    FHttp.Request.ExtraHeaders.Values['Authentication'] := 'bearer ' + FToken;
+
+  FHttp.Request.ExtraHeaders.Values['Cache-Control'] := 'no-cache';
+  FHttp.Request.ExtraHeaders.Values['Pragma'] := 'no-cache';
+  FHttp.Request.ExtraHeaders.Values['Connection'] := 'keep-alive';
+
+  FHttp.Request.ExtraHeaders.Values['Content-Type'] := 'application/x-www-form-urlencoded';
+  //FHttp.Request.ExtraHeaders.Values['Content-Type'] := 'text/html; charset=utf-8';
+  //FHttp.Request.ExtraHeaders.Values['Content-Type'] := 'text/html; charset=utf-8; application/x-www-form-urlencoded';
+
+  FHttp.Request.ExtraHeaders.Values['Accept-Language'] := 'pt-BR,pt;q=0.8,en-US;q=0.6,en;q=0.4';
+  FHttp.Request.ExtraHeaders.Values['Date'] := 'Mon, 29 Apr 2018 21:44:55 GMT';
+  //FHttp.Request.ExtraHeaders.Values['User-Agent'] := 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36';
+
+  Fhttp.HandleRedirects := True;
+end;
+
 function TRestClient.Post(APath: string; AParams: TStringList): TStringStream;
 var
   url: string;
@@ -94,6 +116,7 @@ begin
   url := FormatUrl(APath);
   result := TStringStream.Create('');
   try
+    FormatHeaders;
     FHttp.Post(url, AParams, result);
   except
     on e: Exception do
@@ -112,6 +135,7 @@ begin
   url := FormatUrl(APath);
   result := TStringStream.Create('');
   try
+    FormatHeaders;
     FHttp.Get(url, result);
   except
     on e: Exception do
@@ -171,6 +195,11 @@ begin
   finally
     params.Free;
   end;
+end;
+
+function TRestClient.IsLogged: boolean;
+begin
+  Result := Trim(FToken) <> '';
 end;
 
 end.

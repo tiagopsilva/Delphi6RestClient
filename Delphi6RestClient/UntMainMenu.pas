@@ -8,9 +8,11 @@ uses
 type
   TMainForm = class(TForm)
     btnLogin: TButton;
+    btnObterEscritorio: TButton;
     procedure FormCreate(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure btnLoginClick(Sender: TObject);
+    procedure btnObterEscritorioClick(Sender: TObject);
   private
     FRestClient: TRestClient;
   end;
@@ -25,9 +27,9 @@ implementation
 procedure TMainForm.FormCreate(Sender: TObject);
 begin
   FRestClient := TRestClient.Create;
-  FRestClient.Username := 'theUserName';
-  FRestClient.Password := 'thePassowrd';
-  FRestClient.Host := 'http://localhost:49408/api';
+  FRestClient.Username := 'admin@intsys.com.br';
+  FRestClient.Password := 'qkpm@1106';
+  FRestClient.Host := 'http://localhost:60610/api';
   FRestClient.SigInPath := 'security/token';
 end;
 
@@ -45,6 +47,25 @@ begin
   else
   begin
     showMessage('Usuário e senha inválida!');
+  end;
+end;
+
+procedure TMainForm.btnObterEscritorioClick(Sender: TObject);
+var
+  params: TStringList;
+begin
+  if not FRestClient.IsLogged then
+  begin
+    ShowMessage('Precisa efetuar login primeiro!');
+    exit;
+  end;
+
+  params := TStringList.Create;
+  try
+    params.Values['cpfcnpj'] := '00000000000000';
+    FRestClient.Get('escritorios')
+  finally
+    params.Free;
   end;
 end;
 

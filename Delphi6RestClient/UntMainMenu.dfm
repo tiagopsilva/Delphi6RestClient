@@ -21,10 +21,19 @@ object MainForm: TMainForm
   object btnLogin: TButton
     Left = 20
     Top = 16
-    Width = 137
+    Width = 200
     Height = 25
     Caption = 'Request Token / Login'
     TabOrder = 0
     OnClick = btnLoginClick
+  end
+  object btnObterEscritorio: TButton
+    Left = 20
+    Top = 48
+    Width = 200
+    Height = 25
+    Caption = 'Request Token / Login'
+    TabOrder = 1
+    OnClick = btnObterEscritorioClick
   end
 end
